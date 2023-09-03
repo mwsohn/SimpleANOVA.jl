@@ -1,9 +1,10 @@
 using .DataFrames
 
 function anova(df::DataFrame, observationscolumn::Symbol, factorcolumns::Vector{Symbol}, factortypes::Vector{FactorType} = FactorType[]; factornames::Vector{<:AbstractString} = String[])
-    observations = df[!, observationscolumn]
+    df2 = df[completecases(df,vcat(observationcolumn, factorcolumns),:]
+    observations = df2[!, observationscolumn]
     length(observations) > 0 || return
-    eltype(observations) <: Number || error("Obervations must be numeric")
+    nonmissingtype(eltype(observations)) <: Number || error("Obervations must be numeric")
     isempty(factornames) && (factornames = [String(col) for col ∈ factorcolumns])
-    anova(observations, [df[!, x] for x ∈ factorcolumns], factortypes, factornames = factornames)
+    anova(observations, [df2[!, x] for x ∈ factorcolumns], factortypes, factornames = factornames)
 end
